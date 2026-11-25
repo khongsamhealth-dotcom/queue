@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>จองคิวนัดหมาย &amp; ลงทะเบียนล่วงหน้า - ศบส.45 สาขาคลองสามประเวศ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    * { box-sizing: border-box; font-family: 'Prompt', sans-serif; }
+    body {
+      background: linear-gradient(180deg, #ecfeff 0%, #fdf2f8 100%);
+      margin: 0; padding: 14px; color: #1e293b; min-height: 100vh;
+    }
+    .container { max-width: 760px; margin: 0 auto; }
+
+    .hero {
+      background: linear-gradient(135deg, #14b8a6 0%, #38bdf8 100%);
+      color: #fff; padding: 22px 20px; border-radius: 22px; margin-bottom: 14px;
+      text-align: center; box-shadow: 0 8px 20px rgba(20, 184, 166, 0.25);
+    }
+    .hero h2 { margin: 0 0 6px; font-size: 20px; font-weight: 700; }
+    .hero p { margin: 0; font-size: 13.5px; opacity: 0.95; }
+    .line-badge {
+      display: inline-block; margin-top: 10px; background: rgba(255, 255, 255, 0.22);
+      padding: 4px 14px; border-radius: 999px; font-size: 12.5px; font-weight: 600;
+    }
+
+    .check-entry-btn {
+      width: 100%; padding: 12px 16px; margin-bottom: 14px;
+      background: #ffffff; color: #0284c7; border: 2px solid #7dd3fc;
+      border-radius: 14px; font-size: 14.5px; font-weight: 700; cursor: pointer;
+      box-shadow: 0 3px 10px rgba(2, 132, 199, 0.1); transition: 0.15s;
+    }
+    .check-entry-btn:hover { background: #f0f9ff; border-color: #0284c7; }
+
+    .stepper {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+      margin-bottom: 14px;
+    }
+    .step-pill {
+      background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 12px;
+      padding: 8px 6px; text-align: center; font-size: 12px; font-weight: 600; color: #64748b;
+    }
+    .step-pill.active { background: #ccfbf1; border-color: #0d9488; color: #0f766e; }
+    .step-pill.done { background: #0f766e; border-color: #0f766e; color: #ffffff; }
+
+    .card {
+      background: #ffffff; border-radius: 20px; padding: 20px; margin-bottom: 16px;
+      border: 1.5px solid #e2e8f0; box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+    }
+    .step-title {
+      display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 700;
+      color: #0f766e; margin: 0 0 14px; padding-bottom: 8px; border-bottom: 2px dashed #ccfbf1;
+    }
+    .step-badge {
+      background: #14b8a6; color: #fff; width: 28px; height: 28px; border-radius: 50%;
+      display: inline-flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;
+    }
+
+    .type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 480px) { .type-grid { grid-template-columns: 1fr; } }
+    .choice-card {
+      border: 2px solid #e2e8f0; border-radius: 18px; padding: 24px 14px; text-align: center;
+      cursor: pointer; background: #f8fafc; transition: all 0.2s;
+    }
+    .choice-card:hover { transform: translateY(-2px); border-color: #5eead4; background: #f0fdfa; }
+    .choice-card.active {
+      border-color: #0d9488; background: #ccfbf1; box-shadow: 0 4px 12px rgba(13, 148, 136, 0.18);
+    }
+    .choice-icon { font-size: 38px; margin-bottom: 8px; }
+    .choice-title { font-size: 16px; font-weight: 700; color: #0f172a; }
+    .choice-sub { font-size: 12.5px; color: #475569; margin-top: 4px; }
+
+    .srv-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 14px; }
+    @media (max-width: 520px) { .srv-grid { grid-template-columns: 1fr; } }
+
+    .srv-card {
+      border: 2px solid transparent; border-radius: 18px; padding: 16px 14px; cursor: pointer;
+      transition: all 0.2s; text-align: left; position: relative;
+    }
+    .srv-card:hover { transform: translateY(-2px); }
+    .srv-mint { background: #ecfdf5; border-color: #a7f3d0; }
+    .srv-mint.active { background: #d1fae5; border-color: #059669; box-shadow: 0 4px 12px rgba(5,150,105,0.2); }
+    .srv-sky { background: #eff6ff; border-color: #bfdbfe; }
+    .srv-sky.active { background: #dbeafe; border-color: #2563eb; box-shadow: 0 4px 12px rgba(37,99,235,0.2); }
+    .srv-peach { background: #fff7ed; border-color: #fed7aa; }
+    .srv-peach.active { background: #ffedd5; border-color: #ea580c; box-shadow: 0 4px 12px rgba(234,88,12,0.2); }
+    .srv-lav { background: #faf5ff; border-color: #e9d5ff; }
+    .srv-lav.active { background: #f3e8ff; border-color: #9333ea; box-shadow: 0 4px 12px rgba(147,51,234,0.2); }
+
+    .srv-icon { font-size: 28px; margin-bottom: 6px; }
+    .srv-name { font-size: 15px; font-weight: 700; color: #0f172a; }
+    .srv-time { font-size: 12px; color: #475569; margin-top: 4px; line-height: 1.45; }
+
+    .slot-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+    .slot-pill {
+      padding: 9px 16px; border: 2px solid #cbd5e1; border-radius: 999px; background: #fff;
+      font-size: 13.5px; font-weight: 600; cursor: pointer; color: #334155; transition: 0.15s;
+    }
+    .slot-pill.active { background: #0284c7; color: #fff; border-color: #0284c7; }
+
+    .summary-bar {
+      background: #f0fdfa; border: 1.5px solid #99f6e4; border-radius: 14px;
+      padding: 10px 14px; font-size: 13px; color: #0f766e; font-weight: 600;
+      margin-bottom: 14px; line-height: 1.5;
+    }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+    .field { margin-bottom: 10px; }
+    label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: #334155; }
+    input, select, textarea {
+      width: 100%; padding: 10px 12px; border: 1.5px solid #cbd5e1; border-radius: 12px; font-size: 14px; background: #fff;
+    }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: #14b8a6; }
+    textarea { resize: vertical; min-height: 58px; }
+    .req { color: #dc2626; }
+    .warn-box { background: #fef2f2; border: 1.5px solid #fecaca; color: #991b1b; padding: 10px 12px; border-radius: 12px; font-size: 13px; margin-top: 8px; display: none; }
+    .pdpa-box { background: #f8fafc; border: 1.5px solid #cbd5e1; border-radius: 14px; padding: 12px 14px; font-size: 13px; margin-bottom: 14px; }
+    .pdpa-box label { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; font-weight: 500; margin: 0; }
+    .pdpa-box input { width: auto; margin-top: 3px; }
+
+    .nav-row { display: flex; gap: 10px; margin-top: 14px; }
+    .btn-back {
+      padding: 14px 18px; background: #e2e8f0; color: #334155; border: none;
+      border-radius: 14px; font-size: 15px; font-weight: 700; cursor: pointer; white-space: nowrap;
+    }
+    .btn-next {
+      flex: 1; padding: 14px; background: linear-gradient(135deg, #14b8a6, #0284c7);
+      color: #fff; border: none; border-radius: 14px; font-size: 16px; font-weight: 700; cursor: pointer;
+    }
+    .btn-main {
+      flex: 1; width: 100%; padding: 15px; background: linear-gradient(135deg, #14b8a6, #0284c7);
+      color: #fff; border: none; border-radius: 14px; font-size: 16.5px; font-weight: 700; cursor: pointer;
+      box-shadow: 0 6px 16px rgba(13, 148, 136, 0.25);
+    }
+    .btn-main:disabled { background: #94a3b8; box-shadow: none; }
+    .hidden { display: none !important; }
+
+    .slip-wrap { display: none; }
+    .slip-card {
+      background: #fff; border-radius: 22px; overflow: hidden;
+      border: 2.5px solid #14b8a6; box-shadow: 0 10px 28px rgba(20, 184, 166, 0.18);
+      margin-bottom: 14px;
+    }
+    .slip-top { background: linear-gradient(135deg, #14b8a6, #0284c7); color: #fff; padding: 18px 20px; text-align: center; }
+    .slip-top h3 { margin: 0; font-size: 18px; }
+    .slip-top p { margin: 4px 0 0; font-size: 12.5px; opacity: 0.94; }
+    .slip-body { padding: 20px; }
+    .slip-code-box {
+      background: #f0fdfa; border: 2px dashed #14b8a6; border-radius: 14px;
+      padding: 12px; text-align: center; margin-bottom: 14px;
+    }
+    .slip-code { font-size: 26px; font-weight: 800; color: #0f766e; letter-spacing: 1px; }
+    .slip-tag {
+      display: inline-block; background: #e0f2fe; color: #0369a1; padding: 3px 12px;
+      border-radius: 999px; font-size: 12px; font-weight: 700; margin-top: 4px;
+    }
+    .status-pill {
+      display: inline-block; padding: 4px 12px; border-radius: 999px;
+      font-size: 13px; font-weight: 700;
+    }
+    .st-wait { background: #fef3c7; color: #b45309; }
+    .st-ok { background: #dcfce7; color: #15803d; }
+    .st-done { background: #dbeafe; color: #1d4ed8; }
+    .st-cancel { background: #fee2e2; color: #b91c1c; }
+
+    .slip-table { width: 100%; font-size: 14px; border-collapse: collapse; }
+    .slip-table td { padding: 8px 4px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+    .slip-table td:first-child { color: #64748b; width: 36%; font-weight: 600; }
+    .slip-table td:last-child { color: #0f172a; font-weight: 600; }
+    .slip-note {
+      background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 12px;
+      padding: 12px; font-size: 13px; color: #92400e; margin-top: 14px; line-height: 1.55;
+    }
+    .slip-actions { display: flex; gap: 10px; margin-top: 14px; justify-content: center; flex-wrap: wrap; }
+    .btn-act { padding: 11px 20px; border: none; border-radius: 12px; font-size: 14px; font-weight: 700; cursor: pointer; }
+
+    @media print {
+      @page { size: A4 portrait; margin: 10mm; }
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      body { background: #fff !important; padding: 0; }
+      .hero, .stepper, .slip-actions, .check-entry-btn, #statusSearchBox { display: none !important; }
+      .slip-card {
+        box-shadow: none;
+        break-inside: avoid;
+        page-break-inside: avoid;
+        margin-bottom: 12px;
+      }
+      .slip-top { padding: 12px 16px; }
+      .slip-body { padding: 14px 16px; }
+      .slip-table td { padding: 6px 4px; font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="hero">
+    <h2>🏥 จองคิวนัดหมาย &amp; ลงทะเบียนล่วงหน้า</h2>
+    <p>ศูนย์บริการสาธารณสุข 45 ร่มเกล้า สาขาคลองสามประเวศ กรุงเทพมหานคร</p>
+    <div id="lineStatusBadge" class="line-badge hidden"></div>
+  </div>
+
+  <button type="button" id="btnOpenCheckStatus" class="check-entry-btn" onclick="openStatusCheck()">
+    🔍 ตรวจสอบสถานะนัดหมาย (สำหรับผู้ที่จองคิวไว้แล้ว)
+  </button>
+
+  <div id="statusCheckSection" class="hidden">
+    <div id="statusSearchBox" class="card">
+      <div class="step-title"><span class="step-badge">🔍</span> ตรวจสอบสถานะนัดหมาย</div>
+      <div class="field">
+        <label>กรอกเลขบัตรประชาชน (13 หลัก) หรือ ชื่อ - สกุล</label>
+        <input type="text" id="checkQueryInput" placeholder="ระบุเลขบัตรประชาชน 13 หลัก หรือ ชื่อ-นามสกุล (หรือเบอร์โทร)">
+      </div>
+      <div class="nav-row">
+        <button type="button" class="btn-back" onclick="closeStatusCheck()">← กลับหน้าจองคิว</button>
+        <button type="button" id="btnDoCheck" class="btn-next" onclick="runStatusCheck()">🔍 ค้นหาสถานะ</button>
+      </div>
+    </div>
+    <div id="statusResultArea"></div>
+  </div>
+
+  <div id="slipWrap" class="slip-wrap">
+    <div class="slip-card">
+      <div class="slip-top">
+        <h3>🎫 ใบนัดหมายเข้ารับบริการ (ฉบับดิจิทัล)</h3>
+        <p>ศูนย์บริการสาธารณสุข 45 ร่มเกล้า สาขาคลองสามประเวศ</p>
+      </div>
+      <div class="slip-body">
+        <div class="slip-code-box">
+          <div style="font-size:12px; color:#475569;">รหัสคิวนัดหมายของคุณ</div>
+          <div class="slip-code" id="sCode"></div>
+          <span class="slip-tag" id="sCategory"></span>
+        </div>
+        <table class="slip-table">
+          <tr><td>ชื่อ - สกุล</td><td id="sName"></td></tr>
+          <tr><td>เลข HN (ถ้ามี)</td><td id="sHn"></td></tr>
+          <tr><td>เบอร์โทรศัพท์</td><td id="sPhone"></td></tr>
+          <tr><td>บริการที่นัด</td><td id="sService"></td></tr>
+          <tr><td>วันที่นัดหมาย</td><td id="sDate"></td></tr>
+          <tr><td>ช่วงเวลานัด</td><td id="sSlot"></td></tr>
+          <tr><td>อาการ / เรื่องที่นัด</td><td id="sSymptom"></td></tr>
+          <tr><td>สถานะ</td><td><span class="status-pill st-wait">⏳ รอเจ้าหน้าที่ยืนยันคิว</span></td></tr>
+        </table>
+        <div class="slip-note">
+          📌 <b>ข้อแนะนำวันมารับบริการจริง:</b><br>
+          1. กรุณา<b>แคปหน้าจอใบนัดนี้</b>เก็บไว้ในมือถือ หรือกดพิมพ์เป็น PDF<br>
+          2. นำ<b>บัตรประชาชนตัวจริง</b>มาแสดงที่จุดลงทะเบียนก่อนเวลานัด 15 นาทีค่ะ
+        </div>
+      </div>
+    </div>
+    <div class="slip-actions">
+      <button type="button" class="btn-act" style="background:#0284c7; color:#fff;" onclick="window.print()">🖨️ พิมพ์ / บันทึกใบนัด (PDF)</button>
+      <button type="button" class="btn-act" style="background:#64748b; color:#fff;" onclick="location.reload()">➕ จองคิวรายถัดไป</button>
+    </div>
+  </div>
+
+  <div id="stepperBar" class="stepper">
+    <div id="pill1" class="step-pill active">1. ประเภทผู้รับบริการ</div>
+    <div id="pill2" class="step-pill">2. บริการ &amp; วันเวลา</div>
+    <div id="pill3" class="step-pill">3. กรอกประวัติ &amp; ยืนยัน</div>
+  </div>
+
+  <form id="regForm">
+    <input type="hidden" id="patientCategory" name="patientCategory" value="">
+    <input type="hidden" id="serviceType" name="serviceType" value="">
+    <input type="hidden" id="apptSlot" name="apptSlot" value="">
+
+    <div id="step1Card" class="card">
+      <div class="step-title"><span class="step-badge">1</span> คุณเคยมารับบริการที่นี่แล้วหรือยังคะ?</div>
+      <div class="type-grid">
+        <div class="choice-card" id="btnNewPatient" onclick="selectCategoryAndNext('new')">
+          <div class="choice-icon">🌱</div>
+          <div class="choice-title">ผู้รับบริการใหม่</div>
+          <div class="choice-sub">ยังไม่เคยมีบัตร / กรอกประวัติครั้งแรก</div>
+        </div>
+        <div class="choice-card" id="btnOldPatient" onclick="selectCategoryAndNext('old')">
+          <div class="choice-icon">💚</div>
+          <div class="choice-title">ผู้รับบริการเก่า</div>
+          <div class="choice-sub">เคยมาแล้ว กรอกสั้น ๆ ไม่ต้องกรอกซ้ำ</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="step2Card" class="card hidden">
+      <div class="step-title"><span class="step-badge">2</span> เลือกเรื่องที่ต้องการนัดหมายและวันเวลา</div>
+      <div class="srv-grid">
+        <div class="srv-card srv-mint" onclick="selectService('ตรวจทั่วไป - ทำแผล', this)">
+          <div class="srv-icon">🩺</div>
+          <div class="srv-name">ตรวจทั่วไป - ทำแผล</div>
+          <div class="srv-time">จ–พฤ 08:00–16:00 น.<br>ศุกร์ 13:00–16:00 น.</div>
+        </div>
+        <div class="srv-card srv-sky" onclick="selectService('คลินิกสุขภาพเด็กดี (WBC)', this)">
+          <div class="srv-icon">👶</div>
+          <div class="srv-name">คลินิกสุขภาพเด็กดี (WBC)</div>
+          <div class="srv-time">เฉพาะวันอังคารที่ 2 ของเดือน<br>เวลา 08:00–11:30 น.</div>
+        </div>
+        <div class="srv-card srv-peach" onclick="selectService('ฉีดวัคซีนสัตว์เลี้ยง', this)">
+          <div class="srv-icon">🐶</div>
+          <div class="srv-name">ฉีดวัคซีนสัตว์เลี้ยง</div>
+          <div class="srv-time">ทุกวันศุกร์<br>เวลา 13:00–15:30 น.</div>
+        </div>
+        <div class="srv-card srv-lav" onclick="selectService('นัดหมายเยี่ยมบ้าน', this)">
+          <div class="srv-icon">🏠</div>
+          <div class="srv-name">นัดหมายเยี่ยมบ้าน</div>
+          <div class="srv-time">ทุกวันศุกร์<br>เวลา 08:00–12:00 น.</div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="field">
+          <label>เลือกวันที่ต้องการนัด <span class="req">*</span></label>
+          <input type="date" id="apptDate" name="apptDate" onchange="updateDateSlots()">
+        </div>
+        <div class="field">
+          <label>เลือกช่วงเวลาที่สะดวก <span class="req">*</span></label>
+          <div id="slotContainer" class="slot-list">
+            <span style="font-size:13px; color:#64748b;">กดเลือกกล่องบริการและวันที่ก่อนค่ะ</span>
+          </div>
+        </div>
+      </div>
+      <div id="dateWarn" class="warn-box"></div>
+
+      <div class="nav-row">
+        <button type="button" class="btn-back" onclick="goToStep(1)">← ย้อนกลับ</button>
+        <button type="button" class="btn-next" onclick="nextToStep3()">ถัดไป: กรอกข้อมูล →</button>
+      </div>
+    </div>
+
+    <div id="step3Card" class="hidden">
+      <div id="step3Summary" class="summary-bar"></div>
+
+      <div id="oldPatientSection" class="card hidden">
+        <div class="step-title"><span class="step-badge">3</span> ข้อมูลยืนยันตัวตน (สำหรับผู้รับบริการเก่า)</div>
+        <div class="grid">
+          <div class="field"><label>ชื่อ - สกุล <span class="req">*</span></label><input type="text" id="oldFullName" placeholder="เช่น นายสมชาย ใจดี"></div>
+          <div class="field"><label>เลขบัตรประชาชน (13 หลัก) <span class="req">*</span></label><input type="text" id="oldCitizenId" maxlength="13" placeholder="ไม่ต้องใส่ขีด"></div>
+        </div>
+        <div class="grid">
+          <div class="field"><label>เลข HN (ถ้าทราบ)</label><input type="text" id="oldHn" placeholder="เช่น 3785/55-45"></div>
+          <div class="field"><label>เบอร์โทรศัพท์ <span class="req">*</span></label><input type="tel" id="oldPhone" placeholder="เช่น 0812345678"></div>
+        </div>
+        <div class="field"><label>อาการ / เรื่องที่ต้องการนัด <span class="req">*</span></label><input type="text" id="oldSymptom" placeholder="เช่น ขอตรวจติดตามอาการ, ทำแผล, พาสัตว์เลี้ยงฉีดวัคซีน"></div>
+      </div>
+
+      <div id="newPatientSection" class="hidden">
+        <div class="card">
+          <div class="step-title"><span class="step-badge">3</span> กรอกประวัติส่วนตัว (สำหรับผู้มารับบริการครั้งแรก)</div>
+          <div class="grid">
+            <div class="field">
+              <label>คำนำหน้า <span class="req">*</span></label>
+              <select name="prefix">
+                <option value="นาย">นาย</option><option value="นาง">นาง</option><option value="นางสาว">นางสาว</option>
+                <option value="ด.ช.">ด.ช.</option><option value="ด.ญ.">ด.ญ.</option><option value="อื่นๆ">อื่นๆ</option>
+              </select>
+            </div>
+            <div class="field"><label>ชื่อ - สกุล <span class="req">*</span></label><input type="text" id="newFullName" name="fullName"></div>
+            <div class="field"><label>เลขประจำตัวประชาชน (13 หลัก) <span class="req">*</span></label><input type="text" id="newCitizenId" name="citizenId" maxlength="13" placeholder="ไม่ต้องใส่ขีด"></div>
+          </div>
+          <div class="grid">
+            <div class="field"><label>วัน/เดือน/ปีเกิด</label><input type="date" name="birthDate"></div>
+            <div class="field"><label>อายุ (ปี)</label><input type="number" name="age" min="0" max="120"></div>
+            <div class="field"><label>เพศ</label><select name="gender"><option value="ชาย">ชาย</option><option value="หญิง">หญิง</option></select></div>
+            <div class="field">
+              <label>หมู่เลือด</label>
+              <select name="bloodGroup">
+                <option value="">-- ไม่ทราบ --</option><option value="A">A (เอ)</option>
+                <option value="B">B (บี)</option><option value="O">O (โอ)</option><option value="AB">AB (เอบี)</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid">
+            <div class="field"><label>เชื้อชาติ</label><input type="text" name="race" value="ไทย"></div>
+            <div class="field"><label>สัญชาติ</label><input type="text" name="nationality" value="ไทย"></div>
+            <div class="field">
+              <label>สถานภาพ</label>
+              <select name="maritalStatus"><option value="โสด">โสด</option><option value="สมรส">สมรส</option><option value="หม้าย">หม้าย</option><option value="หย่า">หย่า</option><option value="แยก">แยก</option></select>
+            </div>
+            <div class="field">
+              <label>ศาสนา</label>
+              <select name="religion"><option value="พุทธ">พุทธ</option><option value="อิสลาม">อิสลาม</option><option value="คริสต์">คริสต์</option><option value="อื่นๆ">อื่นๆ</option></select>
+            </div>
+            <div class="field"><label>อาชีพ</label><input type="text" name="occupation" placeholder="รับจ้าง / ค้าขาย / รับราชการ"></div>
+          </div>
+          <div class="field"><label>ที่อยู่ปัจจุบัน (บ้านเลขที่ / หมู่บ้าน / ซอย / ถนน / แขวง / เขต / จังหวัด) <span class="req">*</span></label><textarea id="newAddress" name="address"></textarea></div>
+          <div class="field"><label>เบอร์โทรศัพท์ <span class="req">*</span></label><input type="tel" id="newPhone" name="phone" placeholder="เช่น 0812345678"></div>
+        </div>
+
+        <div class="card">
+          <div class="step-title"><span class="step-badge">4</span> อาการ ประวัติสุขภาพ และข้อมูลติดต่อฉุกเฉิน</div>
+          <div class="field"><label>อาการ / เรื่องที่มาพบแพทย์ <span class="req">*</span></label><input type="text" id="newSymptom" name="symptom"></div>
+          <div class="grid">
+            <div class="field"><label>โรคประจำตัว</label><input type="text" name="chronicDisease" value="ไม่มีโรคประจำตัว"></div>
+            <div class="field"><label>ประวัติการแพ้ยา</label><input type="text" name="drugAllergy" value="ไม่มีประวัติแพ้ยา"></div>
+            <div class="field">
+              <label>สิทธิการรักษา</label>
+              <select name="healthRight">
+                <option value="สิทธิประกันสุขภาพถ้วนหน้า (บัตรทอง)">สิทธิประกันสุขภาพถ้วนหน้า (บัตรทอง)</option>
+                <option value="สิทธิประกันสังคม">สิทธิประกันสังคม</option>
+                <option value="ข้าราชการ/เบิกได้">ข้าราชการ/เบิกได้</option>
+                <option value="ชำระเงินเอง / อื่นๆ">ชำระเงินเอง / อื่นๆ</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid">
+            <div class="field"><label>ชื่อ-สกุล ผู้ติดต่อฉุกเฉิน (พร้อมความสัมพันธ์)</label><input type="text" name="emergencyContact" placeholder="เช่น นางสมศรี ใจดี (มารดา)"></div>
+            <div class="field"><label>เบอร์โทรผู้ติดต่อฉุกเฉิน</label><input type="tel" name="emergencyPhone"></div>
+          </div>
+          <div class="grid">
+            <div class="field"><label>ชื่อ-สกุล คู่สมรส</label><input type="text" name="spouse"></div>
+            <div class="field"><label>ชื่อ-สกุล บิดา</label><input type="text" name="father"></div>
+            <div class="field"><label>ชื่อ-สกุล มารดา</label><input type="text" name="mother"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pdpa-box">
+        <label>
+          <input type="checkbox" id="pdpaConsent" name="pdpaConsent" required>
+          <span>ข้าพเจ้ายืนยันว่าข้อมูลที่กรอกเป็นความจริง และยินยอมให้ศูนย์บริการสาธารณสุข 45 ร่มเกล้า เก็บและใช้ข้อมูลเพื่อการจัดทำเวชระเบียนและบริการทางการแพทย์ ตาม พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล พ.ศ. 2562</span>
+        </label>
+      </div>
+
+      <div class="nav-row">
+        <button type="button" class="btn-back" onclick="goToStep(2)">← ย้อนกลับ</button>
+        <button type="submit" class="btn-main" id="submitBtn">🎫 ยืนยันลงทะเบียนและรับใบนัดหมาย</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+  // ⚠️ นำ URL ของเว็บแอป Apps Script (ลงท้ายด้วย /exec) มาวางแทนที่ข้อความในเครื่องหมายคำพูดนี้
+  const GAS_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzmJKbcQ_A4evCPQQWOiRP7fyQ2ZFlLJtfduPFsOz38vvT39JUFh-rnMz6qK3K9fRkZ/exec';
+
+  let lineProfile = { userId: '', displayName: '' };
+
+  async function initLiff() {
+    try {
+      await liff.init({ liffId: '2012765477-JIvEKFHs' });
+      if (liff.isLoggedIn()) {
+        const profile = await liff.getProfile();
+        lineProfile.userId = profile.userId;
+        lineProfile.displayName = profile.displayName;
+        const badge = document.getElementById('lineStatusBadge');
+        badge.textContent = '🟢 เชื่อมต่อบัญชี LINE: ' + profile.displayName;
+        badge.classList.remove('hidden');
+      } else if (liff.isInClient()) {
+        liff.login();
+      }
+    } catch (err) {
+      console.warn('LIFF Init Info:', err);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('apptDate').min = today;
+    goToStep(1);
+    initLiff();
+  });
+
+  function openStatusCheck() {
+    document.getElementById('btnOpenCheckStatus').classList.add('hidden');
+    document.getElementById('stepperBar').classList.add('hidden');
+    document.getElementById('regForm').classList.add('hidden');
+    document.getElementById('statusCheckSection').classList.remove('hidden');
+    document.getElementById('checkQueryInput').focus();
+  }
+
+  function closeStatusCheck() {
+    document.getElementById('statusCheckSection').classList.add('hidden');
+    document.getElementById('statusResultArea').innerHTML = '';
+    document.getElementById('btnOpenCheckStatus').classList.remove('hidden');
+    document.getElementById('stepperBar').classList.remove('hidden');
+    document.getElementById('regForm').classList.remove('hidden');
+  }
+
+  function getStatusBadgeHtml(status) {
+    if (status === 'ยืนยันแล้ว') {
+      return '<span class="status-pill st-ok">✅ ยืนยันคิวเรียบร้อยแล้ว</span>';
+    } else if (status === 'มารับบริการแล้ว') {
+      return '<span class="status-pill st-done">🏥 มารับบริการแล้ว</span>';
+    } else if (status.includes('ยกเลิก') || status.includes('เลื่อน')) {
+      return '<span class="status-pill st-cancel">❌ ' + status + '</span>';
+    }
+    return '<span class="status-pill st-wait">⏳ ' + (status || 'รอเจ้าหน้าที่ยืนยันคิว') + '</span>';
+  }
+
+  async function runStatusCheck() {
+    const q = document.getElementById('checkQueryInput').value.trim();
+    const area = document.getElementById('statusResultArea');
+    if (!q) {
+      alert('กรุณากรอกเลขบัตรประชาชน ชื่อ-สกุล หรือเบอร์โทรศัพท์ก่อนค่ะ');
+      return;
+    }
+
+    const btn = document.getElementById('btnDoCheck');
+    btn.disabled = true;
+    btn.textContent = 'กำลังค้นหา...';
+    area.innerHTML = '';
+
+    try {
+      const resp = await fetch(GAS_WEBAPP_URL + '?action=check&q=' + encodeURIComponent(q));
+      const res = await resp.json();
+      btn.disabled = false;
+      btn.textContent = '🔍 ค้นหาสถานะ';
+
+      if (res.error) {
+        alert('เกิดข้อผิดพลาด: ' + res.error);
+        return;
+      }
+
+      if (!res || !res.found || res.items.length === 0) {
+        area.innerHTML = '<div class="card" style="text-align:center; color:#dc2626;">❌ ไม่พบข้อมูลนัดหมายจากข้อมูลที่ค้นหาค่ะ<br><span style="font-size:13px; color:#64748b;">กรุณาตรวจสอบเลขบัตรประชาชน 13 หลัก หรือชื่อ-นามสกุล</span></div>';
+        return;
+      }
+
+      area.innerHTML = res.items.map(item => `
+        <div class="slip-card">
+          <div class="slip-top">
+            <h3>🎫 สถานะใบนัดหมาย</h3>
+            <p>ศูนย์บริการสาธารณสุข 45 ร่มเกล้า สาขาคลองสามประเวศ</p>
+          </div>
+          <div class="slip-body">
+            <div class="slip-code-box">
+              <div style="font-size:12px; color:#475569;">รหัสคิวนัดหมาย</div>
+              <div class="slip-code">${item.apptCode}</div>
+              <span class="slip-tag">${item.categoryLabel}</span>
+            </div>
+            <table class="slip-table">
+              <tr><td>สถานะล่าสุด</td><td>${getStatusBadgeHtml(item.status)}</td></tr>
+              <tr><td>ชื่อ - สกุล</td><td>${item.fullName}</td></tr>
+              <tr><td>บริการที่นัด</td><td>${item.serviceType}</td></tr>
+              <tr><td>วันที่นัดหมาย</td><td>${item.apptDateText}</td></tr>
+              <tr><td>ช่วงเวลานัด</td><td>${item.apptSlot}</td></tr>
+              <tr><td>อาการ / เรื่องที่นัด</td><td>${item.symptom}</td></tr>
+            </table>
+          </div>
+        </div>
+      `).join('') + `
+        <div class="slip-actions">
+          <button type="button" class="btn-act" style="background:#0284c7; color:#fff;" onclick="window.print()">🖨️ พิมพ์ / บันทึกใบนัด (PDF)</button>
+        </div>
+      `;
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = '🔍 ค้นหาสถานะ';
+      alert('เชื่อมต่อเซิร์ฟเวอร์ไม่สำเร็จ: ' + err.message);
+    }
+  }
+
+  function selectCategoryAndNext(cat) {
+    document.getElementById('patientCategory').value = cat;
+    document.getElementById('btnNewPatient').classList.toggle('active', cat === 'new');
+    document.getElementById('btnOldPatient').classList.toggle('active', cat === 'old');
+    document.getElementById('newPatientSection').classList.toggle('hidden', cat !== 'new');
+    document.getElementById('oldPatientSection').classList.toggle('hidden', cat !== 'old');
+
+    ['newFullName','newCitizenId','newAddress','newPhone','newSymptom'].forEach(id => {
+      document.getElementById(id).required = (cat === 'new');
+    });
+    ['oldFullName','oldCitizenId','oldPhone','oldSymptom'].forEach(id => {
+      document.getElementById(id).required = (cat === 'old');
+    });
+
+    goToStep(2);
+  }
+
+  function goToStep(step) {
+    document.getElementById('step1Card').classList.toggle('hidden', step !== 1);
+    document.getElementById('step2Card').classList.toggle('hidden', step !== 2);
+    document.getElementById('step3Card').classList.toggle('hidden', step !== 3);
+    document.getElementById('btnOpenCheckStatus').classList.toggle('hidden', step !== 1);
+
+    [1, 2, 3].forEach(n => {
+      const p = document.getElementById('pill' + n);
+      p.classList.remove('active', 'done');
+      if (n < step) p.classList.add('done');
+      else if (n === step) p.classList.add('active');
+    });
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function nextToStep3() {
+    const srv = document.getElementById('serviceType').value;
+    const dt = document.getElementById('apptDate').value;
+    const slot = document.getElementById('apptSlot').value;
+    const cat = document.getElementById('patientCategory').value;
+
+    if (!srv) {
+      alert('กรุณากดเลือกเรื่องที่ต้องการนัดหมายก่อนค่ะ');
+      return;
+    }
+    if (!dt || !slot) {
+      alert('กรุณาเลือกวันที่และช่วงเวลาที่เปิดให้บริการให้เรียบร้อยก่อนค่ะ');
+      return;
+    }
+
+    const catText = cat === 'old' ? '💚 ผู้รับบริการเก่า (กรอกแบบสั้น)' : '🌱 ผู้รับบริการใหม่ (กรอกประวัติครั้งแรก)';
+    document.getElementById('step3Summary').innerHTML =
+      `${catText}<br>📌 บริการ: <b>${srv}</b> | วันที่ <b>${dt}</b> (${slot})`;
+
+    goToStep(3);
+  }
+
+  function selectService(name, el) {
+    document.querySelectorAll('.srv-card').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('serviceType').value = name;
+    updateDateSlots();
+  }
+
+  function updateDateSlots() {
+    const service = document.getElementById('serviceType').value;
+    const dateVal = document.getElementById('apptDate').value;
+    const box = document.getElementById('slotContainer');
+    const warn = document.getElementById('dateWarn');
+
+    document.getElementById('apptSlot').value = '';
+    warn.style.display = 'none';
+
+    if (!service || !dateVal) {
+      box.innerHTML = '<span style="font-size:13px; color:#64748b;">กดเลือกกล่องบริการและวันที่ก่อนค่ะ</span>';
+      return;
+    }
+
+    const d = new Date(dateVal + 'T00:00:00');
+    const day = d.getDay();
+    const dom = d.getDate();
+
+    let slots = [];
+    let errMsg = '';
+
+    if (service === 'ตรวจทั่วไป - ทำแผล') {
+      if (day >= 1 && day <= 4) {
+        slots = ['08:30–10:00 น.', '10:00–11:30 น.', '13:00–14:30 น.', '14:30–16:00 น.'];
+      } else if (day === 5) {
+        slots = ['13:00–14:30 น.', '14:30–16:00 น.'];
+      } else {
+        errMsg = 'ตรวจทั่วไป - ทำแผล เปิดบริการวันจันทร์–พฤหัสบดี (08:00–16:00) และวันศุกร์ (13:00–16:00) เท่านั้นค่ะ';
+      }
+    } else if (service === 'ฉีดวัคซีนสัตว์เลี้ยง') {
+      if (day === 5) {
+        slots = ['13:00–14:15 น.', '14:15–15:30 น.'];
+      } else {
+        errMsg = 'บริการฉีดวัคซีนสัตว์เลี้ยง เปิดเฉพาะวันศุกร์ เวลา 13:00–15:30 น. เท่านั้นค่ะ';
+      }
+    } else if (service === 'คลินิกสุขภาพเด็กดี (WBC)') {
+      if (day === 2 && dom >= 8 && dom <= 14) {
+        slots = ['08:00–09:30 น.', '09:30–11:30 น.'];
+      } else {
+        errMsg = 'คลินิกสุขภาพเด็กดี (WBC) เปิดเฉพาะวันอังคารที่ 2 ของเดือน เวลา 08:00–11:30 น. เท่านั้นค่ะ';
+      }
+    } else if (service === 'นัดหมายเยี่ยมบ้าน') {
+      if (day === 5) {
+        slots = ['08:30–10:00 น.', '10:00–12:00 น.'];
+      } else {
+        errMsg = 'นัดหมายเยี่ยมบ้าน เปิดเฉพาะวันศุกร์ เวลา 08:00–12:00 น. เท่านั้นค่ะ';
+      }
+    }
+
+    if (errMsg) {
+      box.innerHTML = '<span style="font-size:13px; color:#dc2626;">วันที่เลือกไม่เปิดให้บริการนี้ค่ะ</span>';
+      warn.textContent = '⚠️ ' + errMsg;
+      warn.style.display = 'block';
+    } else {
+      box.innerHTML = '';
+      slots.forEach((s, idx) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'slot-pill' + (idx === 0 ? ' active' : '');
+        b.textContent = s;
+        b.onclick = () => {
+          document.querySelectorAll('.slot-pill').forEach(p => p.classList.remove('active'));
+          b.classList.add('active');
+          document.getElementById('apptSlot').value = s;
+        };
+        box.appendChild(b);
+        if (idx === 0) document.getElementById('apptSlot').value = s;
+      });
+    }
+  }
+
+  document.getElementById('regForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    if (!document.getElementById('serviceType').value || !document.getElementById('apptSlot').value) {
+      alert('กรุณาเลือกบริการและวันเวลานัดหมายให้ครบถ้วนค่ะ');
+      goToStep(2);
+      return;
+    }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = 'กำลังบันทึกข้อมูลและสร้างใบนัด...';
+
+    const cat = document.getElementById('patientCategory').value;
+    const form = e.target;
+    const data = {};
+    new FormData(form).forEach((v, k) => data[k] = v);
+
+    if (cat === 'old') {
+      data.fullName = document.getElementById('oldFullName').value.trim();
+      data.citizenId = document.getElementById('oldCitizenId').value.trim();
+      data.hn = document.getElementById('oldHn').value.trim();
+      data.phone = document.getElementById('oldPhone').value.trim();
+      data.symptom = document.getElementById('oldSymptom').value.trim();
+      data.prefix = '';
+      data.address = '';
+    }
+    data.email = '';
+    data.pdpaConsent = document.getElementById('pdpaConsent').checked;
+    data.lineUserId = lineProfile.userId;
+    data.lineDisplayName = lineProfile.displayName;
+
+    try {
+      const resp = await fetch(GAS_WEBAPP_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(data)
+      });
+      const res = await resp.json();
+      if (!res || !res.success) {
+        throw new Error((res && res.error) || 'บันทึกไม่สำเร็จ');
+      }
+
+      document.getElementById('regForm').style.display = 'none';
+      document.getElementById('stepperBar').style.display = 'none';
+      document.getElementById('btnOpenCheckStatus').style.display = 'none';
+      document.getElementById('sCode').textContent = res.apptCode;
+      document.getElementById('sCategory').textContent = res.categoryLabel;
+      document.getElementById('sName').textContent = res.fullName;
+      document.getElementById('sHn').textContent = res.hn;
+      document.getElementById('sPhone').textContent = res.phone;
+      document.getElementById('sService').textContent = res.serviceType;
+      document.getElementById('sDate').textContent = res.apptDateText;
+      document.getElementById('sSlot').textContent = res.apptSlot;
+      document.getElementById('sSymptom').textContent = res.symptom;
+      document.getElementById('slipWrap').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      alert('เกิดข้อผิดพลาด: ' + err.message);
+      btn.disabled = false;
+      btn.textContent = '🎫 ยืนยันลงทะเบียนและรับใบนัดหมาย';
+    }
+  });
+</script>
+</body>
+</html>
